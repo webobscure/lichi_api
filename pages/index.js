@@ -1,21 +1,45 @@
-import Head from 'next/head'
-import styles from '@/styles/Home.module.css'
+import Head from 'next/head';
+import styles from '@/styles/Home.module.css';
 import axios from 'axios';
 
-export default function Home() {
+const url = 'https://api.lichi.com/';
 
- function addToCart () {
-    let url = 'https://api.lichi.com/cart/';
-    document.cookie = "SID=SID.16776900501031.7314273-0;";
-    const credential = document.cookie
-    console.log(credential);    
-    const res =  axios.post( url + 'add?lang=1&shop=1&id=44546', {
-      withCredentials: true,
-      credential,
-      headers: {'Access-Control-Allow-Origin': 'https://api.lichi.com/', 'Content-Type': 'application/x-www-form-urlencoded'},
+// функция для добавления товара в корзину
+async function addToCart(event) {
+  document.cookie = 'SID=SID.16776900501031.7314273-0;';
+  const credential = document.cookie;
+  console.log(credential);
+  const res = await axios.post(url + 'cart/add?lang=1&shop=1&id=94267', {
+    withCredentials: true,
+    credential,
+    headers: {
+      'Access-Control-Allow-Origin': 'https://api.lichi.com',
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+  });
+  console.log(res);
+}
+
+// функция для получения товаров, добавленных в корзину
+async function showCart(event) {
+  document.cookie = 'SID=SID.16776900501031.7314273-0;';
+  const credential = document.cookie;
+  let product = event.target.id;
+  await axios
+    .get('https://api.lichi.com/cart/list?shop=1&lang=1&id=94267')
+    .then((item) => {
+      console.log(item.data.api_data);
     })
-    console.log(res);
-  }
+    .catch((error) => {
+      console.error(error);
+    });
+}
+
+function deleteProduct() {
+  console.log('Remove product');
+}
+
+export default function Home() {
   return (
     <>
       <Head>
@@ -25,10 +49,22 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className={styles.main}>
-       <h1>Hello</h1>
-       <button onClick={addToCart}>Add to cart</button>
+        <h1>Hello</h1>
+        <button onClick={addToCart} className="product" id="94267">
+          Add to cart 1{' '}
+        </button>
+        <button onClick={addToCart} className="product" id="94268">
+          Add to cart 2
+        </button>
+        <button onClick={addToCart} className="product" id="94269">
+          Add to cart 3
+        </button>
 
+        <button onClick={showCart} id="94267">
+          Show cart
+        </button>
+        <button onClick={deleteProduct}>Remove product</button>
       </main>
     </>
-  )
+  );
 }
